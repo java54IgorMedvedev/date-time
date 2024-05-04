@@ -43,7 +43,6 @@ class DateTimeTest {
     private void displayCurrentDateTime(String zonePart) {
         ZoneId.getAvailableZoneIds().stream()
             .filter(z -> z.contains(zonePart))
-            .sorted()
             .forEach(zone -> {
                 ZonedDateTime now = ZonedDateTime.now(ZoneId.of(zone));
                 System.out.println(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm z")));

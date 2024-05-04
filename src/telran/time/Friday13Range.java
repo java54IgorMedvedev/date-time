@@ -1,18 +1,18 @@
 package telran.time;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Friday13Range implements Iterable<Temporal> {
-    Temporal from;
-    Temporal to;
+    LocalDate from;
+    LocalDate to;
+    NextFriday13 adjuster = new NextFriday13();
 
     public Friday13Range(Temporal from, Temporal to) {
-        this.from = from;
-        this.to = to;
+        this.from = LocalDate.from(from);
+        this.to = LocalDate.from(to);
     }
 
     @Override
@@ -21,23 +21,13 @@ public class Friday13Range implements Iterable<Temporal> {
     }
 
     private class FridayIterator implements Iterator<Temporal> {
-        private Temporal current;
+        private LocalDate current;
 
         FridayIterator() {
-            current = from;
-            moveToNextFriday13();
-        }
-
-        private void moveToNextFriday13() {
-            LocalDate date = LocalDate.from(current);
-            while (date.isBefore(LocalDate.from(to))) {
-                date = date.plusDays(1);
-                if (date.getDayOfWeek() == DayOfWeek.FRIDAY && date.getDayOfMonth() == 13) {
-                    current = date;
-                    return;
-                }
+            current = (LocalDate) adjuster.adjustInto(from);
+            if (current.isAfter(to)) {
+                current = null;
             }
-            current = null; 
         }
 
         @Override
@@ -47,11 +37,14 @@ public class Friday13Range implements Iterable<Temporal> {
 
         @Override
         public Temporal next() {
-            if (current == null) {
-                throw new NoSuchElementException();
+            if (!hasNext()) {
+                throw new NoSuchElementException("No more Fridays 13th available");
             }
             Temporal next = current;
-            moveToNextFriday13();
+            current = (LocalDate) adjuster.adjustInto(current.plusDays(1));
+            if (current.isAfter(to)) {
+                current = null;
+            }
             return next;
         }
     }
