@@ -1,51 +1,69 @@
 package telran.time;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Friday13Range implements Iterable<Temporal> {
-    LocalDate from;
-    LocalDate to;
-    NextFriday13 adjuster = new NextFriday13();
+	Temporal from;
+	Temporal to;
 
-    public Friday13Range(Temporal from, Temporal to) {
-        this.from = LocalDate.from(from);
-        this.to = LocalDate.from(to);
-    }
+	private Friday13Range(Temporal from, Temporal to) {
+		this.from = from;
+		this.to = to;
+	}
 
-    @Override
-    public Iterator<Temporal> iterator() {
-        return new FridayIterator();
-    }
+	public static Friday13Range getRange(Temporal from, Temporal to) {
 
-    private class FridayIterator implements Iterator<Temporal> {
-        private LocalDate current;
+		if (compare(from, to) >= 0) {
+			throw new IllegalArgumentException("from Temporal must be less than to Temporal");
+		}
+		return new Friday13Range(from, to);
+	}
 
-        FridayIterator() {
-            current = (LocalDate) adjuster.adjustInto(from);
-            if (current.isAfter(to)) {
-                current = null;
-            }
-        }
+	@Override
+	public Iterator<Temporal> iterator() {
 
-        @Override
-        public boolean hasNext() {
-            return current != null;
-        }
+		return new FridayIterator();
+	}
 
-        @Override
-        public Temporal next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException("No more Fridays 13th available");
-            }
-            Temporal next = current;
-            current = (LocalDate) adjuster.adjustInto(current.plusDays(1));
-            if (current.isAfter(to)) {
-                current = null;
-            }
-            return next;
-        }
-    }
+	private static int compare(Temporal t1, Temporal t2) {
+
+		return (int) (0 - ChronoUnit.DAYS.between(t1, t2));
+
+	}
+
+	private class FridayIterator implements Iterator<Temporal> {
+		NextFriday13 nextFriday13Adjuster = new NextFriday13();
+		Temporal currentFriday13 = getFirstCurrent();
+
+		@Override
+		public boolean hasNext() {
+
+			return compare(currentFriday13, to) <= 0;
+		}
+
+		private Temporal getFirstCurrent() {
+			return from.get(ChronoField.DAY_OF_MONTH) == 13
+					&& from.get(ChronoField.DAY_OF_WEEK)
+					== DayOfWeek.FRIDAY.getValue() ?
+							from : from.with(nextFriday13Adjuster);
+		}
+
+		@Override
+		public Temporal next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			Temporal res = currentFriday13;
+			currentFriday13 = currentFriday13.with(nextFriday13Adjuster);
+			return res;
+		}
+
+	}
+
 }
