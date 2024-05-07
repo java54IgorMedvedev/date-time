@@ -13,8 +13,8 @@ record MonthYear(int month, int year) {}
 public class PrintCalendar {
 
     private static final int TITLE_OFFSET = 5;
-    private static final int COLUMN_WIDTH = 12; 
-    private static DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY; 
+    private static final int COLUMN_WIDTH = 12; // Увеличено для отображения полных названий
+    private static DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY; // значение по умолчанию
 
     public static void main(String[] args) {
         try {
@@ -58,10 +58,10 @@ public class PrintCalendar {
     }
 
     private static void printWeekDays() {
-        System.out.printf("%" + TITLE_OFFSET + "s", ""); 
+        System.out.printf("%" + TITLE_OFFSET + "s", ""); // Уступ для заголовка
         for (int i = 0; i < 7; i++) {
             DayOfWeek day = firstDayOfWeek.plus(i % 7);
-            System.out.printf("%" + COLUMN_WIDTH + "s", day.getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            System.out.printf("%" + COLUMN_WIDTH + "s", day.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         }
         System.out.println();
     }
@@ -87,7 +87,7 @@ public class PrintCalendar {
     }
 
     private static void printTitle(MonthYear monthYear) {
-        String monthName = Month.of(monthYear.month()).getDisplayName(TextStyle.FULL, Locale.getDefault());
+        String monthName = Month.of(monthYear.month()).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         System.out.printf("%" + TITLE_OFFSET + "s%s %d\n", "", monthName, monthYear.year());
     }
 }
