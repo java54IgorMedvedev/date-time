@@ -13,8 +13,8 @@ record MonthYear(int month, int year) {}
 public class PrintCalendar {
 
     private static final int TITLE_OFFSET = 5;
-    private static final int COLUMN_WIDTH = 12; // Увеличено для отображения полных названий
-    private static DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY; // значение по умолчанию
+    private static final int COLUMN_WIDTH = 12; 
+    private static DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY; 
 
     public static void main(String[] args) {
         try {
@@ -58,7 +58,7 @@ public class PrintCalendar {
     }
 
     private static void printWeekDays() {
-        System.out.printf("%" + TITLE_OFFSET + "s", ""); // Уступ для заголовка
+        System.out.printf("%" + TITLE_OFFSET + "s", ""); 
         for (int i = 0; i < 7; i++) {
             DayOfWeek day = firstDayOfWeek.plus(i % 7);
             System.out.printf("%" + COLUMN_WIDTH + "s", day.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
